@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/rajah</color>
+    <color name="colorPrimaryDark">@color/colorPrimary</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="aquamarine">#e07DDFD6</color>
+    <color name="tacha">#D5BE57</color>
+    <color name="vivid_cerise">#D4237A</color>
+    <color name="algae_green">#95DDB2</color>
+    <color name="rajah">#FFB161</color>
+</resources>

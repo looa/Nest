@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context="org.looa.nest.MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/rl_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="160dp">
+
+        <ImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/icon_nest" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/iv_logo"
+            android:layout_alignTop="@id/iv_logo"
+            android:layout_toRightOf="@id/iv_logo"
+            android:gravity="center_vertical"
+            android:paddingLeft="8dp"
+            android:text="欢迎使用Nest插件"
+            android:textColor="@android:color/white"
+            android:textSize="18dp" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl_logo"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="8dp"
+        android:text="这里展示插件功能，你可以打开使用"
+        android:textColor="@android:color/white"
+        android:textSize="12dp" />
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="70dp"
+        android:src="@drawable/icon_dianbo" />
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:src="@drawable/icon_dianbo" />
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:src="@drawable/icon_dianbo" />
+
+    <RelativeLayout
+        android:id="@+id/rl_plugin_enter"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_below="@id/rl_logo"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginTop="72dp"
+        android:background="@drawable/plugin_enter_selector"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/iv_plugin_logo"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_alignParentRight="true"
+            android:padding="16dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icon_dengpao" />
+
+        <TextView
+            android:id="@+id/tv_plugin_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@id/iv_plugin_logo"
+            android:layout_toLeftOf="@id/iv_plugin_logo"
+            android:lines="1"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="16dp"
+            android:text="插件名称可以很长的"
+            android:textColor="#666666"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/tv_plugin_intro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_plugin_name"
+            android:layout_below="@id/tv_plugin_name"
+            android:layout_toLeftOf="@id/iv_plugin_logo"
+            android:ellipsize="end"
+            android:gravity="bottom"
+            android:lines="1"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp"
+            android:text="这是插件功能简介，可以随便介绍一下"
+            android:textColor="#999999"
+            android:textSize="12dp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
