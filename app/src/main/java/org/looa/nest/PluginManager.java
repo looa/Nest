@@ -3,10 +3,14 @@ package org.looa.nest;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 
 /**
  * 插件管理
@@ -27,6 +31,10 @@ public class PluginManager {
 
     private String[] plugins;
     private String pluginInstallDir;
+
+    private HashMap<String, AssetManager> assetManagerHashMap = new HashMap<>();
+    private HashMap<String, Resources> resourcesHashMap = new HashMap<>();
+    private HashMap<String, Resources.Theme> themeHashMap = new HashMap<>();
 
     private PluginManager() {
     }
@@ -53,6 +61,7 @@ public class PluginManager {
             if (!isPluginInstall(packageName)) {
                 installPluginFromAssets(packageName);
             }
+            initPluginsResources(packageName);
         }
     }
 
@@ -94,6 +103,37 @@ public class PluginManager {
         }
     }
 
+
+    private void initPluginsResources(String packageName) {
+        AssetManager assetManager = null;
+        try {
+            assetManager = AssetManager.class.newInstance();
+            Method addAssetPath = assetManager.getClass().getMethod("addAssetPath", String.class);
+            addAssetPath.invoke(assetManager, getPluginInstallPath(packageName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Resources res = context.getResources();
+        Resources mResources = new Resources(assetManager, res.getDisplayMetrics(), res.getConfiguration());
+        Resources.Theme mTheme = mResources.newTheme();
+        mTheme.setTo(context.getTheme());
+
+        assetManagerHashMap.put(packageName, assetManager);
+        resourcesHashMap.put(packageName, mResources);
+        themeHashMap.put(packageName, mTheme);
+    }
+
+    public Resources getResources(String packageName) {
+        return resourcesHashMap.get(packageName);
+    }
+
+    public AssetManager getAssets(String packageName) {
+        return assetManagerHashMap.get(packageName);
+    }
+
+    public Resources.Theme getTheme(String packageName) {
+        return themeHashMap.get(packageName);
+    }
 
     private boolean isPluginInstall(String packageName) {
         String path = getPluginInstallPath(packageName);

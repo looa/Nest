@@ -4,17 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import dalvik.system.DexClassLoader;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * 代理Activity（Host Activity）
@@ -24,6 +23,7 @@ import static android.content.ContentValues.TAG;
 
 public class ProxyActivity extends Activity {
 
+    private String packageName;
     public static final String FROM = "plugin.from";
     public static final int FROM_EXTERNAL = 0;
     public static final int FROM_INTERNAL = 1;
@@ -39,6 +39,7 @@ public class ProxyActivity extends Activity {
         String pluginPackage = intent.getStringExtra(PluginManager.KEY_PLUGIN_PACKAGE);
 
         PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(this, pluginPackage);
+        packageName = pluginInfo.getPackageName();
 
         String pluginDexPath = pluginInfo.getPluginPath();
         String pluginClass = intent.getStringExtra(PluginManager.KEY_PLUGIN_CLASS);
@@ -68,12 +69,6 @@ public class ProxyActivity extends Activity {
             Constructor<?> localConstructor = localClass.getConstructor(new Class[]{});
             Object instance = localConstructor.newInstance(new Object[]{});
 
-            Method[] methods = localClass.getDeclaredMethods();
-            for (Method m : methods) {
-                Log.e(TAG, "launchTargetActivity: " + m.getName());
-            }
-
-
             Method setProxy = localClass.getDeclaredMethod("setProxy", Activity.class);
             setProxy.setAccessible(true);
             setProxy.invoke(instance, this);
@@ -93,5 +88,23 @@ public class ProxyActivity extends Activity {
         intent.setClass(this, ProxyActivity.class);
         intent.putExtra(PluginManager.KEY_PLUGIN_PACKAGE, MyApplication.packageNames[0]);
         super.startActivity(intent);
+    }
+
+    @Override
+    public Resources getResources() {
+        if (packageName == null) {
+            return super.getResources();
+        } else {
+            return PluginManager.getInstance().getResources(packageName);
+        }
+    }
+
+    @Override
+    public AssetManager getAssets() {
+        if (packageName == null) {
+            return super.getAssets();
+        } else {
+            return PluginManager.getInstance().getAssets(packageName);
+        }
     }
 }
