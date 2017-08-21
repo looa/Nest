@@ -3,23 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#dadae0"
-    tools:context="org.looa.hellowordbee.MainActivity">
+    android:background="#f5f5f5"
+    tools:context="org.looa.hellowordbee.TestActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_next"
+        android:layout_above="@+id/button_toast"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="24dp"
-        android:text="这是插件的启动页，欢迎使用插件"
+        android:text="这是插件的测试页，欢迎使用插件"
         android:textSize="18sp" />
 
     <Button
-        android:id="@+id/button_next"
+        android:id="@+id/button_toast"
         android:layout_width="160dp"
         android:layout_height="48dp"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="下一页" />
+        android:text="Toast" />
 </RelativeLayout>

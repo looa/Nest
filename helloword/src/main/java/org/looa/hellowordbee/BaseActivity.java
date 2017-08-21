@@ -2,8 +2,12 @@ package org.looa.hellowordbee;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +33,6 @@ public class BaseActivity extends Activity {
     protected int mFrom = FROM_INTERNAL;
 
     protected void setProxy(Activity proxyActivity) {
-        Log.e(TAG, "setProxy: proxyActivity= " + proxyActivity);
         mProxyActivity = proxyActivity;
     }
 
@@ -56,6 +59,7 @@ public class BaseActivity extends Activity {
             if (componentName != null) {
                 String className = componentName.getClassName();
                 intent.putExtra(PLUGIN_CLASS, className);
+                intent.setClassName(mProxyActivity, className);
                 mProxyActivity.startActivity(intent);
             }
         }
@@ -79,7 +83,6 @@ public class BaseActivity extends Activity {
         }
     }
 
-    @Deprecated
     @Override
     public void setContentView(int layoutResID) {
         if (mProxyActivity == this) {
@@ -96,6 +99,42 @@ public class BaseActivity extends Activity {
             super.addContentView(view, params);
         } else {
             mProxyActivity.addContentView(view, params);
+        }
+    }
+
+    @Override
+    public Resources getResources() {
+        if (mProxyActivity == this || mProxyActivity == null) {
+            return super.getResources();
+        } else {
+            return mProxyActivity.getResources();
+        }
+    }
+
+    @Override
+    public AssetManager getAssets() {
+        if (mProxyActivity == this || mProxyActivity == null) {
+            return super.getAssets();
+        } else {
+            return mProxyActivity.getAssets();
+        }
+    }
+
+    @Override
+    public View findViewById(@IdRes int id) {
+        if (mProxyActivity == this || mProxyActivity == null) {
+            return super.findViewById(id);
+        } else {
+            return mProxyActivity.findViewById(id);
+        }
+    }
+
+    @Override
+    public Context getApplicationContext() {
+        if (mProxyActivity == this || mProxyActivity == null) {
+            return super.getApplicationContext();
+        } else {
+            return mProxyActivity.getApplicationContext();
         }
     }
 }
