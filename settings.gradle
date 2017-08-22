@@ -1,1 +1,1 @@
-include ':app', ':helloword'
+include ':app', ':helloword', ':nest-plugin'
