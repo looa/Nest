@@ -1,12 +1,12 @@
 package org.looa.nest;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -25,7 +25,7 @@ import dalvik.system.DexClassLoader;
  * Created by ran on 2017/8/18.
  */
 
-public class ProxyActivity extends Activity {
+public class ProxyFragmentActivity extends FragmentActivity {
 
     private String packageName;
     private PluginService service;

@@ -3,6 +3,7 @@ package org.looa.nest.plugin;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -15,6 +16,10 @@ import android.view.WindowManager;
  */
 
 public interface PluginService {
+    void attach(Activity proxyActivity);
+
+    void attach(FragmentActivity proxyActivity);
+
     void outCreate(Bundle savedInstanceState);
 
     void outStart();
@@ -30,8 +35,6 @@ public interface PluginService {
     void outStop();
 
     void outDestroy();
-
-    void attach(Activity proxyActivity);
 
     void outSaveInstanceState(Bundle outState);
 

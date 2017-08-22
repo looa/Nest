@@ -9,6 +9,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="pluginName"
+            android:value="@string/app_name" />
+        <meta-data
+            android:name="pluginIntroduce"
+            android:value="这是用于测试Nest系统的插件" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -2,6 +2,7 @@ package org.looa.nest;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -33,11 +34,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         ViewShadow.setElevation(pluginEnter, 30, Color.parseColor("#20000000"));
         pluginEnter.setOnClickListener(this);
+
+        PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(this, MyApplication.packageNames[0]);
+        String name = pluginInfo.getPluginAppName();
+        String intro = pluginInfo.getPluginAppIntroduce();
+        int icon = pluginInfo.getPluginAppIcon();
+        if (name != null) pluginName.setText(name);
+        if (intro != null) pluginIntro.setText(intro);
+        if (icon > 0) {
+            Resources resources = PluginManager.getInstance().getResources(pluginInfo.getPackageName());
+            pluginLogo.setImageDrawable(resources.getDrawable(icon));
+        }
     }
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(this, ProxyActivity.class);
+        Intent intent = new Intent(this, PluginManager.getInstance().getPluginLauncherActivity(this, MyApplication.packageNames[0]));
         intent.putExtra(PluginManager.KEY_PLUGIN_PACKAGE, MyApplication.packageNames[0]);
         startActivity(intent);
     }

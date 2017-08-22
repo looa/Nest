@@ -8,6 +8,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -21,20 +22,19 @@ import android.view.WindowManager;
  * Created by ran on 2017/8/18.
  */
 
-public class PluginActivity extends Activity implements PluginService {
+public class PluginFragmentActivity extends FragmentActivity implements PluginService {
 
     public static final String PLUGIN_CLASS = "PLUGIN_CLASS";
 
-    protected Activity mProxyActivity;
+    protected FragmentActivity mProxyActivity;
 
     @Override
     public void attach(Activity proxyActivity) {
-        mProxyActivity = proxyActivity;
     }
 
     @Override
     public void attach(FragmentActivity proxyActivity) {
-
+        mProxyActivity = proxyActivity;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,9 +280,9 @@ public class PluginActivity extends Activity implements PluginService {
 
     @Override
     public void overridePendingTransition(int enterAnim, int exitAnim) {
-        if(mProxyActivity==null){
+        if (mProxyActivity == null) {
             super.overridePendingTransition(enterAnim, exitAnim);
-        }else{
+        } else {
             mProxyActivity.overridePendingTransition(enterAnim, exitAnim);
         }
     }
@@ -320,6 +320,15 @@ public class PluginActivity extends Activity implements PluginService {
             return super.getWindow();
         } else {
             return mProxyActivity.getWindow();
+        }
+    }
+
+    @Override
+    public FragmentManager getSupportFragmentManager() {
+        if (mProxyActivity == null) {
+            return super.getSupportFragmentManager();
+        } else {
+            return mProxyActivity.getSupportFragmentManager();
         }
     }
 }

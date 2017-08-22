@@ -5,12 +5,20 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.os.Bundle;
 import android.util.Log;
+
+import org.looa.nest.plugin.PluginActivity;
+import org.looa.nest.plugin.PluginFragmentActivity;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+
+import dalvik.system.DexClassLoader;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * 插件管理
@@ -35,6 +43,7 @@ public class PluginManager {
     private HashMap<String, AssetManager> assetManagerHashMap = new HashMap<>();
     private HashMap<String, Resources> resourcesHashMap = new HashMap<>();
     private HashMap<String, Resources.Theme> themeHashMap = new HashMap<>();
+    private HashMap<String, DexClassLoader> dexClassLoaderHashMap = new HashMap<>();
 
     private PluginManager() {
     }
@@ -143,12 +152,59 @@ public class PluginManager {
         return exists && !BuildConfig.DEBUG;
     }
 
+    public Class getPluginLauncherActivity(Context context, String packageName) {
+        String pluginClass = null;
+        String pluginDexPath = getPluginInstallPath(packageName);
+        PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(pluginDexPath, PackageManager.GET_ACTIVITIES);
+        if (packageInfo.activities != null && packageInfo.activities.length > 0) {
+            pluginClass = packageInfo.activities[0].name;
+        }
+        return getClass(pluginClass);
+    }
+
+    public DexClassLoader getDexClassLoader(Context context, String packageName) {
+        DexClassLoader dexClassLoader = dexClassLoaderHashMap.get(packageName);
+        if (dexClassLoader == null) {
+            PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(context, packageName);
+            String pluginDexPath = pluginInfo.getPluginPath();
+            File dexOutputDir = context.getDir("dex", MODE_PRIVATE);
+            final String dexOutputPath = dexOutputDir.getAbsolutePath();
+            ClassLoader localClassLoader = context.getClassLoader();
+            dexClassLoader = new DexClassLoader(pluginDexPath, dexOutputPath, null, localClassLoader);
+            dexClassLoaderHashMap.put(packageName, dexClassLoader);
+        }
+        return dexClassLoader;
+    }
+
+    public Class getClass(String className) {
+        Class targetClass = PluginActivity.class;
+        try {
+            Class cls = Class.forName(className);
+            while (cls.getClass().getSuperclass() != Object.class || cls.getClass().getSuperclass() != null) {
+                cls = cls.getClass().getSuperclass();
+                if (cls == PluginActivity.class) {
+                    targetClass = ProxyActivity.class;
+                    break;
+                } else if (cls == PluginFragmentActivity.class) {
+                    targetClass = ProxyFragmentActivity.class;
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return targetClass;
+    }
+
     public PluginInfo getPluginInfo(Context context, String packageName) {
         PluginInfo info = new PluginInfo();
         if (packageName != null && packageName.lastIndexOf(".") != -1) {
             String pluginName = packageName.substring(packageName.lastIndexOf(".") + 1);
             String pluginPath = null;
             String versionName = null;
+            String pluginAppName = null;
+            String pluginAppIntroduce = null;
+            int pluginAppIcon = 0;
             int versionCode = 0;
             if (plugins != null && plugins.length > 0) {
                 for (String plugin : plugins) {
@@ -158,13 +214,22 @@ public class PluginManager {
                         PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(
                                 pluginPath, PackageManager.GET_META_DATA);
                         if (packageInfo == null) return info;
+                        Bundle bundle = packageInfo.applicationInfo.metaData;
+                        if (bundle != null) {
+                            pluginAppName = bundle.getString("pluginName");
+                            pluginAppIntroduce = bundle.getString("pluginIntroduce");
+                        }
                         if (!packageName.equals(packageInfo.packageName)) return info;
                         versionCode = packageInfo.versionCode;
                         versionName = packageInfo.versionName;
+                        pluginAppIcon = packageInfo.applicationInfo.icon;
                         break;
                     }
                 }
             }
+            info.setPluginAppIcon(pluginAppIcon);
+            info.setPluginAppName(pluginAppName);
+            info.setPluginAppIntroduce(pluginAppIntroduce);
             info.setPackageName(packageName);
             info.setVersionName(versionName);
             info.setVersionCode(versionCode);

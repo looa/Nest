@@ -7,11 +7,38 @@ package org.looa.nest;
  */
 
 public class PluginInfo {
+    private int pluginAppIcon;
+    private String pluginAppName;
+    private String pluginAppIntroduce;
     private String pluginPath;
     private String pluginName;
     private String packageName;
     private String versionName;
     private int versionCode;
+
+    public int getPluginAppIcon() {
+        return pluginAppIcon;
+    }
+
+    public void setPluginAppIcon(int pluginAppIcon) {
+        this.pluginAppIcon = pluginAppIcon;
+    }
+
+    public String getPluginAppName() {
+        return pluginAppName;
+    }
+
+    public void setPluginAppName(String pluginAppName) {
+        this.pluginAppName = pluginAppName;
+    }
+
+    public String getPluginAppIntroduce() {
+        return pluginAppIntroduce;
+    }
+
+    public void setPluginAppIntroduce(String pluginAppIntroduce) {
+        this.pluginAppIntroduce = pluginAppIntroduce;
+    }
 
     public String getPluginPath() {
         return pluginPath;
