@@ -8,10 +8,15 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.WindowManager;
+
+import org.looa.nest.plugin.PluginService;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 import dalvik.system.DexClassLoader;
 
@@ -24,9 +29,7 @@ import dalvik.system.DexClassLoader;
 public class ProxyActivity extends Activity {
 
     private String packageName;
-    public static final String FROM = "plugin.from";
-    public static final int FROM_EXTERNAL = 0;
-    public static final int FROM_INTERNAL = 1;
+    private PluginService service;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,25 +65,115 @@ public class ProxyActivity extends Activity {
         }
         File dexOutputDir = this.getDir("dex", MODE_PRIVATE);
         final String dexOutputPath = dexOutputDir.getAbsolutePath();
-        ClassLoader localClassLoader = ClassLoader.getSystemClassLoader();
+        ClassLoader localClassLoader = getClassLoader();
         DexClassLoader dexClassLoader = new DexClassLoader(pluginDexPath, dexOutputPath, null, localClassLoader);
         try {
             Class<?> localClass = dexClassLoader.loadClass(pluginClass);
-            Constructor<?> localConstructor = localClass.getConstructor(new Class[]{});
-            Object instance = localConstructor.newInstance(new Object[]{});
-
-            Method setProxy = localClass.getDeclaredMethod("setProxy", Activity.class);
-            setProxy.setAccessible(true);
-            setProxy.invoke(instance, this);
-
-            Method onCreate = localClass.getDeclaredMethod("onCreate", Bundle.class);
-            onCreate.setAccessible(true);
+            Constructor<?> localConstructor = localClass.getConstructor();
+            Object instance = localConstructor.newInstance();
+            service = (PluginService) instance;
+            service.attach(this);
             Bundle bundle = new Bundle();
-            bundle.putInt(FROM, FROM_EXTERNAL);
-            onCreate.invoke(instance, new Object[]{bundle});
+            service.outCreate(bundle);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (service != null) service.outResume();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (service != null) service.outStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (service != null) service.outRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (service != null) service.outPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (service != null) service.outStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (service != null) service.outDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (service != null) service.outActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (service != null) service.outSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (service != null) service.outNewIntent(intent);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (service != null) service.outRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (service != null) return service.outTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void onWindowAttributesChanged(WindowManager.LayoutParams params) {
+        super.onWindowAttributesChanged(params);
+        if (service != null) service.outWindowAttributesChanged(params);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (service != null) service.outWindowFocusChanged(hasFocus);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (service != null) service.outBackPressed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (service != null) return service.outCreateOptionsMenu(menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (service != null) service.outOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
