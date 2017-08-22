@@ -1,18 +1,16 @@
 package org.looa.nest;
 
-import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-import org.looa.nest.plugin.PluginActivity;
 import org.looa.nest.plugin.PluginService;
 
 import java.lang.reflect.Constructor;
@@ -25,7 +23,7 @@ import dalvik.system.DexClassLoader;
  * Created by ran on 2017/8/18.
  */
 
-public class ProxyActivity extends Activity {
+public class ProxyActivity extends FragmentActivity {
 
     private String packageName;
     private PluginService service;
@@ -48,14 +46,13 @@ public class ProxyActivity extends Activity {
     }
 
     private void launchTargetActivity(String pluginClass) {
-        Class<?> localClass = null;
+        Class<?> localClass;
         if (pluginClass == null) {
-            localClass = PluginManager.getInstance().getPluginLauncherActivity(this, packageName);
-            if (localClass == null) return;
+            pluginClass = PluginManager.getInstance().getPluginLauncherActivity(this, packageName);
         }
         DexClassLoader dexClassLoader = PluginManager.getInstance().getDexClassLoader(this, packageName);
         try {
-            if (localClass == null) localClass = dexClassLoader.loadClass(pluginClass);
+            localClass = dexClassLoader.loadClass(pluginClass);
             Constructor<?> localConstructor = localClass.getConstructor();
             Object instance = localConstructor.newInstance();
             service = (PluginService) instance;
@@ -165,12 +162,7 @@ public class ProxyActivity extends Activity {
 
     @Override
     public void startActivity(Intent intent) {
-        Class targetClass = PluginActivity.class;
-        ComponentName componentName = intent.getComponent();
-        if (componentName != null) {
-            String className = componentName.getClassName();
-            targetClass = PluginManager.getInstance().getClass(className);
-        }
+        Class targetClass = ProxyActivity.class;
         intent.setClass(this, targetClass);
         intent.putExtra(PluginManager.KEY_PLUGIN_PACKAGE, MyApplication.packageNames[0]);
         super.startActivity(intent);

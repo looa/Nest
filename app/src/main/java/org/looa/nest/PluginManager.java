@@ -8,9 +8,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 
-import org.looa.nest.plugin.PluginActivity;
-import org.looa.nest.plugin.PluginFragmentActivity;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -152,14 +149,14 @@ public class PluginManager {
         return exists && !BuildConfig.DEBUG;
     }
 
-    public Class getPluginLauncherActivity(Context context, String packageName) {
+    public String getPluginLauncherActivity(Context context, String packageName) {
         String pluginClass = null;
         String pluginDexPath = getPluginInstallPath(packageName);
         PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(pluginDexPath, PackageManager.GET_ACTIVITIES);
         if (packageInfo.activities != null && packageInfo.activities.length > 0) {
             pluginClass = packageInfo.activities[0].name;
         }
-        return getClass(pluginClass);
+        return pluginClass;
     }
 
     public DexClassLoader getDexClassLoader(Context context, String packageName) {
@@ -174,26 +171,6 @@ public class PluginManager {
             dexClassLoaderHashMap.put(packageName, dexClassLoader);
         }
         return dexClassLoader;
-    }
-
-    public Class getClass(String className) {
-        Class targetClass = PluginActivity.class;
-        try {
-            Class cls = Class.forName(className);
-            while (cls.getClass().getSuperclass() != Object.class || cls.getClass().getSuperclass() != null) {
-                cls = cls.getClass().getSuperclass();
-                if (cls == PluginActivity.class) {
-                    targetClass = ProxyActivity.class;
-                    break;
-                } else if (cls == PluginFragmentActivity.class) {
-                    targetClass = ProxyFragmentActivity.class;
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return targetClass;
     }
 
     public PluginInfo getPluginInfo(Context context, String packageName) {

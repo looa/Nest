@@ -1,6 +1,5 @@
 package org.looa.nest.plugin;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -16,8 +15,6 @@ import android.view.WindowManager;
  */
 
 public interface PluginService {
-    void attach(Activity proxyActivity);
-
     void attach(FragmentActivity proxyActivity);
 
     void outCreate(Bundle savedInstanceState);

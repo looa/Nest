@@ -49,7 +49,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(this, PluginManager.getInstance().getPluginLauncherActivity(this, MyApplication.packageNames[0]));
+        Intent intent = new Intent(this, ProxyActivity.class);
         intent.putExtra(PluginManager.KEY_PLUGIN_PACKAGE, MyApplication.packageNames[0]);
         startActivity(intent);
     }
