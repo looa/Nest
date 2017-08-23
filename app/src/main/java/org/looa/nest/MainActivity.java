@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.looa.nest.host.PluginInfo;
+import org.looa.nest.host.PluginManager;
+import org.looa.nest.host.ProxyActivity;
 import org.looa.view.ViewShadow;
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -35,7 +38,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         ViewShadow.setElevation(pluginEnter, 30, Color.parseColor("#20000000"));
         pluginEnter.setOnClickListener(this);
 
-        PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(this, MyApplication.packageNames[0]);
+        PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(MyApplication.packageNames[0]);
         String name = pluginInfo.getPluginAppName();
         String intro = pluginInfo.getPluginAppIntroduce();
         int icon = pluginInfo.getPluginAppIcon();

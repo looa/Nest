@@ -1,4 +1,4 @@
-package org.looa.nest;
+package org.looa.nest.host;
 
 /**
  * 插件信息

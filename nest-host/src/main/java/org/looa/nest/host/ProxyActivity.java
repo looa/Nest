@@ -1,6 +1,7 @@
-package org.looa.nest;
+package org.looa.nest.host;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -25,31 +26,44 @@ import dalvik.system.DexClassLoader;
 
 public class ProxyActivity extends FragmentActivity {
 
+    private String TAG;
+    private String pluginPackage;
     private String packageName;
+    private String pluginClass;
     private PluginService service;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         obtainProxyData();
+        resetOrientation();
+        super.onCreate(savedInstanceState);
+        launchTargetActivity(pluginClass);
     }
 
     private void obtainProxyData() {
         Intent intent = getIntent();
-        String pluginPackage = intent.getStringExtra(PluginManager.KEY_PLUGIN_PACKAGE);
-
-        PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(this, pluginPackage);
+        pluginPackage = intent.getStringExtra(PluginManager.KEY_PLUGIN_PACKAGE);
+        pluginClass = intent.getStringExtra(PluginManager.KEY_PLUGIN_CLASS);
+        PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(pluginPackage);
         packageName = pluginInfo.getPackageName();
+        if (pluginClass == null) {
+            pluginClass = PluginManager.getInstance().getPluginLauncherActivity(packageName);
+        }
+        TAG = ProxyActivity.this.getClass().getSimpleName() + "<" + pluginClass + ">";
+    }
 
-        String pluginClass = intent.getStringExtra(PluginManager.KEY_PLUGIN_CLASS);
-        launchTargetActivity(pluginClass);
+    private void resetOrientation() {
+        ActivityInfo info = PluginManager.getInstance().getPluginActivity(packageName, pluginClass);
+        int screenOrientation = info.screenOrientation;
+        if (screenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else if (screenOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
     }
 
     private void launchTargetActivity(String pluginClass) {
         Class<?> localClass;
-        if (pluginClass == null) {
-            pluginClass = PluginManager.getInstance().getPluginLauncherActivity(this, packageName);
-        }
         DexClassLoader dexClassLoader = PluginManager.getInstance().getDexClassLoader(this, packageName);
         try {
             localClass = dexClassLoader.loadClass(pluginClass);
@@ -164,7 +178,7 @@ public class ProxyActivity extends FragmentActivity {
     public void startActivity(Intent intent) {
         Class targetClass = ProxyActivity.class;
         intent.setClass(this, targetClass);
-        intent.putExtra(PluginManager.KEY_PLUGIN_PACKAGE, MyApplication.packageNames[0]);
+        intent.putExtra(PluginManager.KEY_PLUGIN_PACKAGE, pluginPackage);
         super.startActivity(intent);
     }
 
@@ -183,6 +197,16 @@ public class ProxyActivity extends FragmentActivity {
             return super.getAssets();
         } else {
             return PluginManager.getInstance().getAssets(packageName);
+        }
+    }
+
+    @Override
+    public void setTheme(int resId) {
+        if (packageName == null) {
+            super.setTheme(resId);
+        } else {
+            ActivityInfo info = PluginManager.getInstance().getPluginActivity(packageName, pluginClass);
+            super.setTheme(info.theme);
         }
     }
 }

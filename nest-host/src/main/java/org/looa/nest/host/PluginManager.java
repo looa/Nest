@@ -1,12 +1,12 @@
-package org.looa.nest;
+package org.looa.nest.host;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +40,7 @@ public class PluginManager {
     private HashMap<String, AssetManager> assetManagerHashMap = new HashMap<>();
     private HashMap<String, Resources> resourcesHashMap = new HashMap<>();
     private HashMap<String, Resources.Theme> themeHashMap = new HashMap<>();
+    private HashMap<String, ActivityInfo> activityInfoHashMap = new HashMap<>();
     private HashMap<String, DexClassLoader> dexClassLoaderHashMap = new HashMap<>();
 
     private PluginManager() {
@@ -63,7 +64,6 @@ public class PluginManager {
         initPluginsAssetsPath();
         if (packageNames == null) return;
         for (String packageName : packageNames) {
-            Log.w(TAG, "initPlugin: " + isPluginInstall(packageName));
             if (!isPluginInstall(packageName)) {
                 installPluginFromAssets(packageName);
             }
@@ -99,12 +99,9 @@ public class PluginManager {
             FileUtils.copyAsserts(context, path, cacheFilePath);
             String pluginPath = getPluginInstallPath(packageName);
             FileUtils.copyFileToFile(cacheFilePath, pluginPath);
-            File file2 = new File(pluginPath);
             FileUtils.deleteFile(cacheFilePath);
-            Log.e(TAG, "installPluginFromAssets2Cache: pluginPath    = " + file2.length());
             return true;
         } catch (IOException e) {
-            Log.e(TAG, "installPluginFromAssets2Cache: " + e.getMessage());
             return false;
         }
     }
@@ -122,7 +119,6 @@ public class PluginManager {
         Resources res = context.getResources();
         Resources mResources = new Resources(assetManager, res.getDisplayMetrics(), res.getConfiguration());
         Resources.Theme mTheme = mResources.newTheme();
-        mTheme.setTo(context.getTheme());
 
         assetManagerHashMap.put(packageName, assetManager);
         resourcesHashMap.put(packageName, mResources);
@@ -145,24 +141,53 @@ public class PluginManager {
         String path = getPluginInstallPath(packageName);
         File file = new File(path);
         boolean exists = file.exists();
-        Log.w(TAG, "isPluginInstall: " + file.length());
         return exists && !BuildConfig.DEBUG;
     }
 
-    public String getPluginLauncherActivity(Context context, String packageName) {
-        String pluginClass = null;
+    public ActivityInfo[] getPluginActivities(String packageName) {
         String pluginDexPath = getPluginInstallPath(packageName);
-        PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(pluginDexPath, PackageManager.GET_ACTIVITIES);
-        if (packageInfo.activities != null && packageInfo.activities.length > 0) {
-            pluginClass = packageInfo.activities[0].name;
+        PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(pluginDexPath, PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA);
+        return packageInfo.activities;
+    }
+
+    public ActivityInfo getPluginActivity(String packageName, String activityName) {
+        ActivityInfo result;
+        if ((result = activityInfoHashMap.get(packageName + activityName)) == null) {
+            ActivityInfo[] info = getPluginActivities(packageName);
+            if (info != null) {
+                for (ActivityInfo activityInfo : info) {
+                    if (activityName.equals(activityInfo.name)) {
+                        activityInfoHashMap.put(packageName + activityName, activityInfo);
+                        return activityInfo;
+                    }
+                }
+            }
+            return null;
+        } else {
+            return result;
+        }
+    }
+
+    public String getPluginLauncherActivity(String packageName) {
+        String pluginClass = null;
+        ActivityInfo[] info = getPluginActivities(packageName);
+        if (info != null && info.length > 0) {
+            pluginClass = info[0].name;
         }
         return pluginClass;
     }
 
+    /**
+     * 获取dexClassLoader
+     *
+     * @param context     不能是ApplicationContext
+     * @param packageName 待加载dex的包名
+     * @return
+     */
     public DexClassLoader getDexClassLoader(Context context, String packageName) {
         DexClassLoader dexClassLoader = dexClassLoaderHashMap.get(packageName);
         if (dexClassLoader == null) {
-            PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(context, packageName);
+            PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(packageName);
             String pluginDexPath = pluginInfo.getPluginPath();
             File dexOutputDir = context.getDir("dex", MODE_PRIVATE);
             final String dexOutputPath = dexOutputDir.getAbsolutePath();
@@ -173,7 +198,7 @@ public class PluginManager {
         return dexClassLoader;
     }
 
-    public PluginInfo getPluginInfo(Context context, String packageName) {
+    public PluginInfo getPluginInfo(String packageName) {
         PluginInfo info = new PluginInfo();
         if (packageName != null && packageName.lastIndexOf(".") != -1) {
             String pluginName = packageName.substring(packageName.lastIndexOf(".") + 1);
@@ -187,7 +212,6 @@ public class PluginManager {
                 for (String plugin : plugins) {
                     if (plugin.contains(pluginName)) {
                         pluginPath = getPluginInstallPath(packageName);
-                        Log.w(TAG, "getPluginInfo: " + pluginPath);
                         PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(
                                 pluginPath, PackageManager.GET_META_DATA);
                         if (packageInfo == null) return info;

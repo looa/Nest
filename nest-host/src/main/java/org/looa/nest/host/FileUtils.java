@@ -1,5 +1,5 @@
 
-package org.looa.nest;
+package org.looa.nest.host;
 
 import android.content.Context;
 import android.text.TextUtils;

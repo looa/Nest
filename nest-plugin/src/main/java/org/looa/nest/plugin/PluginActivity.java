@@ -24,6 +24,7 @@ import android.view.WindowManager;
 public class PluginActivity extends FragmentActivity implements PluginService {
 
     public static final String PLUGIN_CLASS = "PLUGIN_CLASS";
+    private String TAG;
 
     protected FragmentActivity mProxyActivity;
 
@@ -36,8 +37,11 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        TAG = "PluginActivity<" + getClass().getName() + ">";
         if (mProxyActivity == null) {
             super.onCreate(savedInstanceState);
+        } else {
+            setIntent(mProxyActivity.getIntent());
         }
     }
 
@@ -275,9 +279,9 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void overridePendingTransition(int enterAnim, int exitAnim) {
-        if(mProxyActivity==null){
+        if (mProxyActivity == null) {
             super.overridePendingTransition(enterAnim, exitAnim);
-        }else{
+        } else {
             mProxyActivity.overridePendingTransition(enterAnim, exitAnim);
         }
     }
@@ -315,6 +319,15 @@ public class PluginActivity extends FragmentActivity implements PluginService {
             return super.getWindow();
         } else {
             return mProxyActivity.getWindow();
+        }
+    }
+
+    @Override
+    public Resources.Theme getTheme() {
+        if (mProxyActivity == null) {
+            return super.getTheme();
+        } else {
+            return mProxyActivity.getTheme();
         }
     }
 

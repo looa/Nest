@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import org.looa.nest.plugin.PluginActivity;
 import org.looa.nest.plugin.PluginService;
+import org.looa.tabview.widget.TabView;
 
 import java.lang.reflect.Constructor;
 
@@ -27,6 +28,7 @@ public class TestActivity extends PluginActivity implements View.OnClickListener
 
     private Button button;
     private View view;
+    private TabView tabView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,9 @@ public class TestActivity extends PluginActivity implements View.OnClickListener
         setContentView(R.layout.activity_test);
         button = (Button) findViewById(R.id.button_toast);
         button.setOnClickListener(this);
+
+        tabView = (TabView) findViewById(R.id.tab);
+//        tabView.setBackgroundColor(getResources().getColor(R.color.colorTest));
     }
 
     @Override

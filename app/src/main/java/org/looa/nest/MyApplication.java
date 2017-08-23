@@ -1,8 +1,7 @@
 package org.looa.nest;
 
-import android.app.Application;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
+import org.looa.nest.host.PluginManager;
+import org.looa.nest.host.ProxyApplication;
 
 /**
  * my application.
@@ -10,10 +9,11 @@ import android.content.res.Resources;
  * Created by ran on 2017/8/18.
  */
 
-public class MyApplication extends Application {
+public class MyApplication extends ProxyApplication {
 
     public static final String[] packageNames = {
-            "org.looa.hellowordbee"
+            "org.looa.hellowordbee",
+            "com.sennnv.manager"
     };
 
     @Override
@@ -23,34 +23,7 @@ public class MyApplication extends Application {
     }
 
     @Override
-    public Resources getResources() {
-        StackTraceElement[] stackElements = new Throwable().getStackTrace();
-        if (stackElements != null) {
-            for (StackTraceElement stackElement : stackElements) {
-                String className = stackElement.getClassName();
-                for (String packageName : packageNames) {
-                    if (className.contains(packageName)) {
-                        return PluginManager.getInstance().getResources(packageName);
-                    }
-                }
-            }
-        }
-        return super.getResources();
-    }
-
-    @Override
-    public AssetManager getAssets() {
-        StackTraceElement[] stackElements = new Throwable().getStackTrace();
-        if (stackElements != null) {
-            for (StackTraceElement stackElement : stackElements) {
-                String className = stackElement.getClassName();
-                for (String packageName : packageNames) {
-                    if (className.contains(packageName)) {
-                        return PluginManager.getInstance().getAssets(packageName);
-                    }
-                }
-            }
-        }
-        return super.getAssets();
+    public String[] getPluginPackageNames() {
+        return packageNames;
     }
 }
