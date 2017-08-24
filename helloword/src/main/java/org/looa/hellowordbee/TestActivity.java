@@ -55,7 +55,7 @@ public class TestActivity extends PluginActivity implements View.OnClickListener
         else content = "Plugin is running inside Nest!";
         Toast.makeText(getApplicationContext(), content, Toast.LENGTH_SHORT).show();
         if (view == null) {
-            view = LayoutInflater.from(getBaseContext()).inflate(R.layout.view_test, null);
+            view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_test, null);
             ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             addContentView(view, layoutParams);
         }

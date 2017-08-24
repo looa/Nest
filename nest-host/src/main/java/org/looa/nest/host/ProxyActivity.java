@@ -208,4 +208,13 @@ public class ProxyActivity extends FragmentActivity {
             return PluginManager.getInstance().getAssets(packageName);
         }
     }
+
+    @Override
+    public Resources.Theme getTheme() {
+        if (packageName == null) {
+            return super.getTheme();
+        } else {
+            return PluginManager.getInstance().getTheme(getBaseContext(), packageName, pluginClass);
+        }
+    }
 }

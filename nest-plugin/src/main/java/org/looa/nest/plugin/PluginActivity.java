@@ -273,8 +273,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
         if (mProxyActivity == null) {
             super.setContentView(layoutResID);
         } else {
-            View view = getLayoutInflater().inflate(layoutResID, null);
-            mProxyActivity.setContentView(view);
+            mProxyActivity.setContentView(layoutResID);
         }
     }
 
@@ -293,6 +292,15 @@ public class PluginActivity extends FragmentActivity implements PluginService {
             super.setContentView(view, params);
         } else {
             mProxyActivity.setContentView(view, params);
+        }
+    }
+
+    @Override
+    public void addContentView(View view, ViewGroup.LayoutParams params) {
+        if (mProxyActivity == null) {
+            super.addContentView(view, params);
+        } else {
+            mProxyActivity.addContentView(view, params);
         }
     }
 

@@ -119,6 +119,7 @@ public class PluginManager {
         Resources res = context.getResources();
         Resources mResources = new Resources(assetManager, res.getDisplayMetrics(), res.getConfiguration());
         Resources.Theme mTheme = mResources.newTheme();
+        mTheme.setTo(context.getTheme());
 
         assetManagerHashMap.put(packageName, assetManager);
         resourcesHashMap.put(packageName, mResources);
@@ -133,9 +134,22 @@ public class PluginManager {
         return assetManagerHashMap.get(packageName);
     }
 
-    public Resources.Theme getTheme(String packageName) {
-        return themeHashMap.get(packageName);
+    public Resources.Theme getTheme(Context context, String packageName, String activityName) {
+        Resources.Theme theme = themeHashMap.get(packageName);
+//        ActivityInfo activityInfo = getPluginActivity(packageName, activityName);
+//        int themeResID = activityInfo.theme;
+//        if (themeResID == 0) {
+//            try {
+//                themeResID = getPluginPackageInfo(packageName).applicationInfo.theme;
+//            } catch (Exception e) {
+//                themeResID = this.context.getApplicationInfo().theme;
+//            }
+//        }
+//        context.setTheme(themeResID);
+//        theme.setTo(context.getTheme());
+        return theme;
     }
+
 
     private boolean isPluginInstall(String packageName) {
         String path = getPluginInstallPath(packageName);
