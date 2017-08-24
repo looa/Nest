@@ -3,6 +3,7 @@ package org.looa.nest.host;
 import android.app.Application;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.util.Log;
 
 /**
  * proxy application.
@@ -11,6 +12,8 @@ import android.content.res.Resources;
  */
 
 public abstract class ProxyApplication extends Application {
+
+    private String TAG = getClass().getName();
 
     /**
      * 获取预装插件的包名组
@@ -53,5 +56,27 @@ public abstract class ProxyApplication extends Application {
             }
         }
         return super.getAssets();
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        String[] packageNames;
+        if ((packageNames = getPluginPackageNames()) == null) return super.getClassLoader();
+        long startTime = System.currentTimeMillis();
+        StackTraceElement[] stackElements = new Throwable().getStackTrace();
+        if (stackElements != null) {
+            for (StackTraceElement stackElement : stackElements) {
+                Log.d(TAG, "getClassLoader: " + stackElement.getClassName());
+                String className = stackElement.getClassName();
+                for (String packageName : packageNames) {
+                    if (className.contains(packageName)) {
+                        Log.i(TAG, "getClassLoader: success!");
+                        Log.w(TAG, "The time spent is " + (System.currentTimeMillis() - startTime) + " millis.");
+                        return PluginManager.getInstance().getDexClassLoader(this, packageName);
+                    }
+                }
+            }
+        }
+        return super.getClassLoader();
     }
 }

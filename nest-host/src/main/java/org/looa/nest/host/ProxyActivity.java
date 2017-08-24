@@ -183,6 +183,15 @@ public class ProxyActivity extends FragmentActivity {
     }
 
     @Override
+    public ClassLoader getClassLoader() {
+        if (packageName == null) {
+            return super.getClassLoader();
+        } else {
+            return PluginManager.getInstance().getDexClassLoader(getBaseContext(), packageName);
+        }
+    }
+
+    @Override
     public Resources getResources() {
         if (packageName == null) {
             return super.getResources();
@@ -197,16 +206,6 @@ public class ProxyActivity extends FragmentActivity {
             return super.getAssets();
         } else {
             return PluginManager.getInstance().getAssets(packageName);
-        }
-    }
-
-    @Override
-    public void setTheme(int resId) {
-        if (packageName == null) {
-            super.setTheme(resId);
-        } else {
-            ActivityInfo info = PluginManager.getInstance().getPluginActivity(packageName, pluginClass);
-            super.setTheme(info.theme);
         }
     }
 }

@@ -6,11 +6,16 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -31,6 +36,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
     @Override
     public void attach(FragmentActivity proxyActivity) {
         mProxyActivity = proxyActivity;
+        attachBaseContext(mProxyActivity);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,6 +269,34 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
 
     @Override
+    public void setContentView(@LayoutRes int layoutResID) {
+        if (mProxyActivity == null) {
+            super.setContentView(layoutResID);
+        } else {
+            View view = getLayoutInflater().inflate(layoutResID, null);
+            mProxyActivity.setContentView(view);
+        }
+    }
+
+    @Override
+    public void setContentView(View view) {
+        if (mProxyActivity == null) {
+            super.setContentView(view);
+        } else {
+            mProxyActivity.setContentView(view);
+        }
+    }
+
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        if (mProxyActivity == null) {
+            super.setContentView(view, params);
+        } else {
+            mProxyActivity.setContentView(view, params);
+        }
+    }
+
+    @Override
     public void startActivity(Intent intent) {
         if (mProxyActivity == null) {
             super.startActivity(intent);
@@ -283,6 +317,15 @@ public class PluginActivity extends FragmentActivity implements PluginService {
             super.overridePendingTransition(enterAnim, exitAnim);
         } else {
             mProxyActivity.overridePendingTransition(enterAnim, exitAnim);
+        }
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        if (mProxyActivity == null) {
+            return super.getClassLoader();
+        } else {
+            return mProxyActivity.getClassLoader();
         }
     }
 
@@ -339,4 +382,41 @@ public class PluginActivity extends FragmentActivity implements PluginService {
             return mProxyActivity.getSupportFragmentManager();
         }
     }
+
+    @Override
+    public LayoutInflater getLayoutInflater() {
+        if (mProxyActivity == null) {
+            return super.getLayoutInflater();
+        } else {
+            return LayoutInflaterManager.getInstance().getLayoutInflater(this);
+        }
+    }
+
+    @Override
+    public MenuInflater getMenuInflater() {
+        if (mProxyActivity == null) {
+            return super.getMenuInflater();
+        } else {
+            return mProxyActivity.getMenuInflater();
+        }
+    }
+
+    @Override
+    public Object getSystemService(String name) {
+        if (mProxyActivity == null) {
+            return super.getSystemService(name);
+        } else {
+            return mProxyActivity.getSystemService(name);
+        }
+    }
+
+    @Override
+    public void finish() {
+        if (mProxyActivity == null) {
+            super.finish();
+        } else {
+            mProxyActivity.finish();
+        }
+    }
+
 }

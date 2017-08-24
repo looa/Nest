@@ -10,7 +10,10 @@
         android:layout_above="@+id/button_toast"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="24dp"
-        android:text="这是插件的测试页，欢迎使用插件"
+        android:background="@color/colorTest"
+        android:padding="16dp"
+        android:text="@string/app_name"
+        android:textColor="@android:color/black"
         android:textSize="18sp" />
 
     <Button

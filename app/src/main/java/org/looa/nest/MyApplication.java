@@ -19,7 +19,7 @@ public class MyApplication extends ProxyApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        PluginManager.getInstance().initPlugin(this, packageNames);
+        PluginManager.getInstance().initPlugin(this, MyApplication.packageNames);
     }
 
     @Override

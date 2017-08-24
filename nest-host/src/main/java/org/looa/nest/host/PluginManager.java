@@ -141,12 +141,17 @@ public class PluginManager {
         String path = getPluginInstallPath(packageName);
         File file = new File(path);
         boolean exists = file.exists();
-        return exists && !BuildConfig.DEBUG;
+        //TODO
+        return false;
+    }
+
+    public PackageInfo getPluginPackageInfo(String packageName) {
+        String pluginDexPath = getPluginInstallPath(packageName);
+        return context.getPackageManager().getPackageArchiveInfo(pluginDexPath, PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA);
     }
 
     public ActivityInfo[] getPluginActivities(String packageName) {
-        String pluginDexPath = getPluginInstallPath(packageName);
-        PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(pluginDexPath, PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA);
+        PackageInfo packageInfo = getPluginPackageInfo(packageName);
         return packageInfo.activities;
     }
 
