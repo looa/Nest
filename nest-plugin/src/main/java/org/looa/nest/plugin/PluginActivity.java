@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -391,14 +390,6 @@ public class PluginActivity extends FragmentActivity implements PluginService {
         }
     }
 
-    @Override
-    public LayoutInflater getLayoutInflater() {
-        if (mProxyActivity == null) {
-            return super.getLayoutInflater();
-        } else {
-            return LayoutInflaterManager.getInstance().getLayoutInflater(this);
-        }
-    }
 
     @Override
     public MenuInflater getMenuInflater() {

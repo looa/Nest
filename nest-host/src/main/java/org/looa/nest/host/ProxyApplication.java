@@ -59,6 +59,24 @@ public abstract class ProxyApplication extends Application {
     }
 
     @Override
+    public Resources.Theme getTheme() {
+        String[] packageNames;
+        if ((packageNames = getPluginPackageNames()) == null) return super.getTheme();
+        StackTraceElement[] stackElements = new Throwable().getStackTrace();
+        if (stackElements != null) {
+            for (StackTraceElement stackElement : stackElements) {
+                String className = stackElement.getClassName();
+                for (String packageName : packageNames) {
+                    if (className.contains(packageName)) {
+                        return PluginManager.getInstance().getTheme(packageName);
+                    }
+                }
+            }
+        }
+        return super.getTheme();
+    }
+
+    @Override
     public ClassLoader getClassLoader() {
         String[] packageNames;
         if ((packageNames = getPluginPackageNames()) == null) return super.getClassLoader();

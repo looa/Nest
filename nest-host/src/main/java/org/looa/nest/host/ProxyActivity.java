@@ -214,7 +214,7 @@ public class ProxyActivity extends FragmentActivity {
         if (packageName == null) {
             return super.getTheme();
         } else {
-            return PluginManager.getInstance().getTheme(getBaseContext(), packageName, pluginClass);
+            return PluginManager.getInstance().getTheme(packageName);
         }
     }
 }

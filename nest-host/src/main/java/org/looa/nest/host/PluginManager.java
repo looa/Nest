@@ -134,7 +134,7 @@ public class PluginManager {
         return assetManagerHashMap.get(packageName);
     }
 
-    public Resources.Theme getTheme(Context context, String packageName, String activityName) {
+    public Resources.Theme getTheme(String packageName) {
         Resources.Theme theme = themeHashMap.get(packageName);
 //        ActivityInfo activityInfo = getPluginActivity(packageName, activityName);
 //        int themeResID = activityInfo.theme;
