@@ -14,7 +14,7 @@ import android.view.WindowManager;
  * Created by ran out 2017/8/22.
  */
 
-public interface PluginService {
+public interface PluginActivityService {
     void attach(FragmentActivity proxyActivity);
 
     void outCreate(Bundle savedInstanceState);

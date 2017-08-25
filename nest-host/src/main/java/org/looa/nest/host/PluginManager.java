@@ -7,9 +7,13 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
+
+import org.looa.nest.plugin.PluginApplicationService;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -161,7 +165,7 @@ public class PluginManager {
 
     public PackageInfo getPluginPackageInfo(String packageName) {
         String pluginDexPath = getPluginInstallPath(packageName);
-        return context.getPackageManager().getPackageArchiveInfo(pluginDexPath, PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA);
+        return context.getPackageManager().getPackageArchiveInfo(pluginDexPath, PackageManager.GET_CONFIGURATIONS | PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA);
     }
 
     public ActivityInfo[] getPluginActivities(String packageName) {
@@ -196,6 +200,11 @@ public class PluginManager {
         return pluginClass;
     }
 
+    private String getPluginApplication(String packageName) {
+        PackageInfo packageInfo = getPluginPackageInfo(packageName);
+        return packageInfo.applicationInfo.className;
+    }
+
     /**
      * 获取dexClassLoader
      *
@@ -206,15 +215,37 @@ public class PluginManager {
     public DexClassLoader getDexClassLoader(Context context, String packageName) {
         DexClassLoader dexClassLoader = dexClassLoaderHashMap.get(packageName);
         if (dexClassLoader == null) {
-            PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(packageName);
-            String pluginDexPath = pluginInfo.getPluginPath();
-            File dexOutputDir = context.getDir("dex", MODE_PRIVATE);
-            final String dexOutputPath = dexOutputDir.getAbsolutePath();
-            ClassLoader localClassLoader = context.getClassLoader();
-            dexClassLoader = new DexClassLoader(pluginDexPath, dexOutputPath, null, localClassLoader);
-            dexClassLoaderHashMap.put(packageName, dexClassLoader);
+            dexClassLoader = initDexClassLoader(context, packageName);
+            initPluginApplication(dexClassLoader, packageName);
         }
         return dexClassLoader;
+    }
+
+    private DexClassLoader initDexClassLoader(Context context, String packageName) {
+        DexClassLoader dexClassLoader;
+        PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(packageName);
+        String pluginDexPath = pluginInfo.getPluginPath();
+        File dexOutputDir = context.getDir("dex", MODE_PRIVATE);
+        final String dexOutputPath = dexOutputDir.getAbsolutePath();
+        ClassLoader localClassLoader = context.getClassLoader();
+        dexClassLoader = new DexClassLoader(pluginDexPath, dexOutputPath, null, localClassLoader);
+        dexClassLoaderHashMap.put(packageName, dexClassLoader);
+        return dexClassLoader;
+    }
+
+    private void initPluginApplication(DexClassLoader classLoader, String packageName) {
+        String applicationClass = getPluginApplication(packageName);
+        Log.e(TAG, "initPluginApplication: " + applicationClass);
+        try {
+            Class localClass = classLoader.loadClass(applicationClass);
+            Constructor<?> localConstructor = localClass.getConstructor();
+            Object instance = localConstructor.newInstance();
+            PluginApplicationService service = (PluginApplicationService) instance;
+            service.attach(context.getApplicationContext());
+            service.outCreate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public PluginInfo getPluginInfo(String packageName) {

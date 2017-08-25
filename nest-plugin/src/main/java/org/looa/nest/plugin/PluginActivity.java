@@ -7,8 +7,10 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,7 +27,7 @@ import android.view.WindowManager;
  * Created by ran on 2017/8/18.
  */
 
-public class PluginActivity extends FragmentActivity implements PluginService {
+public class PluginActivity extends FragmentActivity implements PluginActivityService {
 
     public static final String PLUGIN_CLASS = "PLUGIN_CLASS";
     private String TAG;
@@ -43,7 +45,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         TAG = "PluginActivity<" + getClass().getName() + ">";
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onCreate(savedInstanceState);
         } else {
             setIntent(mProxyActivity.getIntent());
@@ -57,7 +59,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onStart() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onStart();
         }
     }
@@ -69,7 +71,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onRestart() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onRestart();
         }
     }
@@ -82,7 +84,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onResume() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onResume();
         }
     }
@@ -94,7 +96,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onPause() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onPause();
         }
     }
@@ -106,7 +108,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onStop() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onStop();
         }
     }
@@ -118,7 +120,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onDestroy() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onDestroy();
         }
     }
@@ -133,7 +135,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -145,7 +147,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onSaveInstanceState(outState);
         }
     }
@@ -157,7 +159,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onNewIntent(intent);
         }
     }
@@ -169,7 +171,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onRestoreInstanceState(savedInstanceState);
         }
     }
@@ -181,7 +183,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.onTouchEvent(event);
         } else {
             return false;
@@ -195,7 +197,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void onWindowAttributesChanged(WindowManager.LayoutParams params) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onWindowAttributesChanged(params);
         }
     }
@@ -207,7 +209,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onWindowFocusChanged(hasFocus);
         }
     }
@@ -219,7 +221,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void onBackPressed() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.onBackPressed();
         }
     }
@@ -231,7 +233,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.onCreateOptionsMenu(menu);
         } else {
             if (mProxyActivity.getParent() != null) {
@@ -248,7 +250,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.onOptionsItemSelected(item);
         } else {
             if (mProxyActivity.getParent() != null) {
@@ -269,7 +271,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.setContentView(layoutResID);
         } else {
             mProxyActivity.setContentView(layoutResID);
@@ -278,7 +280,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void setContentView(View view) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.setContentView(view);
         } else {
             mProxyActivity.setContentView(view);
@@ -287,7 +289,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void setContentView(View view, ViewGroup.LayoutParams params) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.setContentView(view, params);
         } else {
             mProxyActivity.setContentView(view, params);
@@ -296,7 +298,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void addContentView(View view, ViewGroup.LayoutParams params) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.addContentView(view, params);
         } else {
             mProxyActivity.addContentView(view, params);
@@ -305,7 +307,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void startActivity(Intent intent) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.startActivity(intent);
         } else {
             ComponentName componentName = intent.getComponent();
@@ -320,7 +322,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public void overridePendingTransition(int enterAnim, int exitAnim) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.overridePendingTransition(enterAnim, exitAnim);
         } else {
             mProxyActivity.overridePendingTransition(enterAnim, exitAnim);
@@ -329,7 +331,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public ClassLoader getClassLoader() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.getClassLoader();
         } else {
             return mProxyActivity.getClassLoader();
@@ -338,7 +340,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public Resources getResources() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.getResources();
         } else {
             return mProxyActivity.getResources();
@@ -347,7 +349,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public AssetManager getAssets() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.getAssets();
         } else {
             return mProxyActivity.getAssets();
@@ -356,7 +358,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public Context getApplicationContext() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.getApplicationContext();
         } else {
             return mProxyActivity.getApplicationContext();
@@ -365,7 +367,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public Window getWindow() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.getWindow();
         } else {
             return mProxyActivity.getWindow();
@@ -374,26 +376,17 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public Resources.Theme getTheme() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.getTheme();
         } else {
             return mProxyActivity.getTheme();
         }
     }
 
-    @Override
-    public FragmentManager getSupportFragmentManager() {
-        if (mProxyActivity == null) {
-            return super.getSupportFragmentManager();
-        } else {
-            return mProxyActivity.getSupportFragmentManager();
-        }
-    }
-
 
     @Override
     public MenuInflater getMenuInflater() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.getMenuInflater();
         } else {
             return mProxyActivity.getMenuInflater();
@@ -402,7 +395,7 @@ public class PluginActivity extends FragmentActivity implements PluginService {
 
     @Override
     public Object getSystemService(String name) {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             return super.getSystemService(name);
         } else {
             return mProxyActivity.getSystemService(name);
@@ -410,12 +403,51 @@ public class PluginActivity extends FragmentActivity implements PluginService {
     }
 
     @Override
+    public FragmentManager getSupportFragmentManager() {
+        if (!isPlugin()) {
+            return super.getSupportFragmentManager();
+        } else {
+            return mProxyActivity.getSupportFragmentManager();
+        }
+    }
+
+    @Override
+    public LoaderManager getSupportLoaderManager() {
+        if (!isPlugin()) {
+            return super.getSupportLoaderManager();
+        } else {
+            return mProxyActivity.getSupportLoaderManager();
+        }
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        if (!isPlugin()) {
+            super.onAttachFragment(fragment);
+        } else {
+            mProxyActivity.onAttachFragment(fragment);
+        }
+    }
+
+    @Override
     public void finish() {
-        if (mProxyActivity == null) {
+        if (!isPlugin()) {
             super.finish();
         } else {
             mProxyActivity.finish();
         }
     }
 
+    @Override
+    public void onLowMemory() {
+        if (!isPlugin()) {
+            super.onLowMemory();
+        } else {
+            mProxyActivity.onLowMemory();
+        }
+    }
+
+    public boolean isPlugin() {
+        return mProxyActivity != null;
+    }
 }

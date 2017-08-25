@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-import org.looa.nest.plugin.PluginService;
+import org.looa.nest.plugin.PluginActivityService;
 
 import java.lang.reflect.Constructor;
 
@@ -30,14 +30,14 @@ public class ProxyActivity extends FragmentActivity {
     private String pluginPackage;
     private String packageName;
     private String pluginClass;
-    private PluginService service;
+    private PluginActivityService service;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         obtainProxyData();
         resetOrientation();
         super.onCreate(savedInstanceState);
-        launchTargetActivity(pluginClass);
+        launchTargetActivity(pluginClass, savedInstanceState);
     }
 
     private void obtainProxyData() {
@@ -62,17 +62,16 @@ public class ProxyActivity extends FragmentActivity {
         }
     }
 
-    private void launchTargetActivity(String pluginClass) {
+    private void launchTargetActivity(String pluginClass, @Nullable Bundle savedInstanceState) {
         Class<?> localClass;
         DexClassLoader dexClassLoader = PluginManager.getInstance().getDexClassLoader(this, packageName);
         try {
             localClass = dexClassLoader.loadClass(pluginClass);
             Constructor<?> localConstructor = localClass.getConstructor();
             Object instance = localConstructor.newInstance();
-            service = (PluginService) instance;
+            service = (PluginActivityService) instance;
             service.attach(this);
-            Bundle bundle = new Bundle();
-            service.outCreate(bundle);
+            service.outCreate(savedInstanceState);
         } catch (Exception e) {
             e.printStackTrace();
         }
