@@ -22,6 +22,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TextView pluginIntro;
     private ImageView pluginLogo;
 
+    private String packageName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +40,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         ViewShadow.setElevation(pluginEnter, 30, Color.parseColor("#20000000"));
         pluginEnter.setOnClickListener(this);
 
-        PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(MyApplication.packageNames[0]);
+        packageName = MyApplication.packageNames[0];
+
+        PluginInfo pluginInfo = PluginManager.getInstance().getPluginInfo(packageName);
         String name = pluginInfo.getPluginAppName();
         String intro = pluginInfo.getPluginAppIntroduce();
         int icon = pluginInfo.getPluginAppIcon();
@@ -53,7 +57,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         Intent intent = new Intent(this, ProxyActivity.class);
-        intent.putExtra(PluginManager.KEY_PLUGIN_PACKAGE, MyApplication.packageNames[0]);
+        intent.putExtra(PluginManager.KEY_PLUGIN_PACKAGE, packageName);
         startActivity(intent);
     }
 }

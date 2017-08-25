@@ -139,18 +139,24 @@ public class PluginManager {
     }
 
     public Resources.Theme getTheme(String packageName) {
+        return getTheme(packageName, null);
+    }
+
+    public Resources.Theme getTheme(String packageName, String activityName) {
+        int themeResID = 0;
         Resources.Theme theme = themeHashMap.get(packageName);
-//        ActivityInfo activityInfo = getPluginActivity(packageName, activityName);
-//        int themeResID = activityInfo.theme;
-//        if (themeResID == 0) {
-//            try {
-//                themeResID = getPluginPackageInfo(packageName).applicationInfo.theme;
-//            } catch (Exception e) {
-//                themeResID = this.context.getApplicationInfo().theme;
-//            }
-//        }
-//        context.setTheme(themeResID);
-//        theme.setTo(context.getTheme());
+        if (activityName != null) {
+            ActivityInfo activityInfo = getPluginActivity(packageName, activityName);
+            themeResID = activityInfo.theme;
+        }
+        if (themeResID == 0) {
+            try {
+                themeResID = getPluginPackageInfo(packageName).applicationInfo.theme;
+            } catch (Exception e) {
+                themeResID = this.context.getApplicationInfo().theme;
+            }
+        }
+        theme.applyStyle(themeResID, true);
         return theme;
     }
 
