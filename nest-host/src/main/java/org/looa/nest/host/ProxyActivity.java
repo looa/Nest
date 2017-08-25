@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -34,10 +35,13 @@ public class ProxyActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        long start = System.currentTimeMillis();
         obtainProxyData();
         resetOrientation();
         super.onCreate(savedInstanceState);
         launchTargetActivity(pluginClass, savedInstanceState);
+        Log.e(TAG, "onCreate: use time: " + (System.currentTimeMillis() - start) + " millis.");
+        Log.d(TAG, "onCreate: end!");
     }
 
     private void obtainProxyData() {
@@ -50,6 +54,7 @@ public class ProxyActivity extends FragmentActivity {
             pluginClass = PluginManager.getInstance().getPluginLauncherActivity(packageName);
         }
         TAG = ProxyActivity.this.getClass().getSimpleName() + "<" + pluginClass + ">";
+        Log.d(TAG, "obtainProxyData: end!");
     }
 
     private void resetOrientation() {
@@ -60,6 +65,7 @@ public class ProxyActivity extends FragmentActivity {
         } else if (screenOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
+        Log.d(TAG, "resetOrientation: end!");
     }
 
     private void launchTargetActivity(String pluginClass, @Nullable Bundle savedInstanceState) {
@@ -75,6 +81,7 @@ public class ProxyActivity extends FragmentActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.d(TAG, "launchTargetActivity: end!");
     }
 
     @Override

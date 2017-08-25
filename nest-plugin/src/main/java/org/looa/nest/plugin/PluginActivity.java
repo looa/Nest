@@ -321,6 +321,21 @@ public class PluginActivity extends FragmentActivity implements PluginActivitySe
     }
 
     @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        if (!isPlugin()) {
+            super.startActivityForResult(intent, requestCode);
+        } else {
+            ComponentName componentName = intent.getComponent();
+            if (componentName != null) {
+                String className = componentName.getClassName();
+                intent.putExtra(PLUGIN_CLASS, className);
+                intent.setClassName(mProxyActivity, className);
+                mProxyActivity.startActivityForResult(intent, requestCode);
+            }
+        }
+    }
+
+    @Override
     public void overridePendingTransition(int enterAnim, int exitAnim) {
         if (!isPlugin()) {
             super.overridePendingTransition(enterAnim, exitAnim);
