@@ -12,8 +12,7 @@ import org.looa.nest.host.ProxyApplication;
 public class MyApplication extends ProxyApplication {
 
     public static final String[] packageNames = {
-            "org.looa.hellowordbee",
-            "com.sennnv.manager"
+            "org.looa.hellowordbee"
     };
 
     @Override
